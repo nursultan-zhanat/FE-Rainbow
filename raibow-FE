@@ -1,0 +1,39 @@
+-- Server Script
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+local colorChangeEvent = Instance.new("RemoteEvent")
+colorChangeEvent.Name = "ColorChangeEvent"
+colorChangeEvent.Parent = ReplicatedStorage
+
+colorChangeEvent.OnServerEvent:Connect(function(player, object, color)
+    if object:IsA("BasePart") then
+        object.Color = color
+    end
+end)
+
+-- Local Script
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local colorChangeEvent = ReplicatedStorage:WaitForChild("ColorChangeEvent")
+
+local function randomColor()
+    return Color3.new(math.random(), math.random(), math.random())
+end
+
+local function colorize(object)
+    if object:IsA("BasePart") then
+        local newColor = randomColor()
+        colorChangeEvent:FireServer(object, newColor)
+    end
+end
+
+local function traverse(object)
+    colorize(object)
+    for _, child in ipairs(object:GetChildren()) do
+        traverse(child)
+    end
+end
+
+while true do
+    traverse(game.Workspace)
+    wait(0.1)
+end
